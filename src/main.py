@@ -46,32 +46,190 @@ Voici comment bien démarrer :
     st.info(
         "Vous pourrez retrouver ce guide à tout moment dans l'onglet '🧑‍💼 Guide Utilisateur'."
     )
-    step = st.session_state.get("onboarding_step", 1)
-
+    if "onboarding_step" not in st.session_state:
+        st.session_state["onboarding_step"] = 1
+    step = st.session_state["onboarding_step"]
+    steps = {
+        1: "Configuration des connexions",
+        2: "Préférences de recherche",
+        3: "Découverte des fonctionnalités",
+    }
+    st.progress(step / len(steps))
     if step == 1:
-        st.subheader("1️⃣ Configuration des connexions")
-        st.write(
-            "Rendez-vous dans l'onglet 'Configuration & Connexions' pour saisir vos clés API. Toutes les connexions doivent être vertes avant de continuer."
+        st.subheader("1️⃣ Configuration des connexions API")
+        services = ["OpenAI", "Notion", "Google"]
+        # Statut et messages en session
+        for s in services:
+            st.session_state.setdefault(f"{s.lower()}_status", "❌")
+            st.session_state.setdefault(f"{s.lower()}_msg", "Non testé")
+        # Tableau de statut
+        st.table(
+            {
+                "Service": services,
+                "Statut": [st.session_state[f"{s.lower()}_status"] for s in services],
+                "Message": [st.session_state[f"{s.lower()}_msg"] for s in services],
+            }
         )
-        if st.button("J'ai configuré mes connexions ✅"):
-            st.session_state["onboarding_step"] = 2
-            st.rerun()
+        with st.form("api_form_onboarding"):
+            # Gestion affichage/masquage des clés
+            if "show_openai" not in st.session_state:
+                st.session_state["show_openai"] = False
+            if "show_notion" not in st.session_state:
+                st.session_state["show_notion"] = False
+            if "show_google" not in st.session_state:
+                st.session_state["show_google"] = False
+            col1, col2 = st.columns([8, 2])
+            with col1:
+                openai_key = st.text_input(
+                    "Clé API OpenAI",
+                    value=st.session_state.get("openai_key", ""),
+                    type="default" if st.session_state["show_openai"] else "password",
+                    help="Clé API OpenAI. Obtenez-la ici : https://platform.openai.com/api-keys",
+                )
+            with col2:
+                if st.button(
+                    "Afficher" if not st.session_state["show_openai"] else "Masquer",
+                    key="show_openai_btn",
+                ):
+                    st.session_state["show_openai"] = not st.session_state[
+                        "show_openai"
+                    ]
+            if st.session_state["openai_status"] == "❌":
+                st.error(st.session_state["openai_msg"])
+                st.markdown("[Aide OpenAI](https://platform.openai.com/api-keys)")
+            # Notion
+            col1, col2 = st.columns([8, 2])
+            with col1:
+                notion_key = st.text_input(
+                    "Clé API Notion",
+                    value=st.session_state.get("notion_key", ""),
+                    type="default" if st.session_state["show_notion"] else "password",
+                    help="Clé d'intégration Notion. Créez-la ici : https://www.notion.com/my-integrations (puis partagez votre base avec l'intégration)",
+                )
+            with col2:
+                if st.button(
+                    "Afficher" if not st.session_state["show_notion"] else "Masquer",
+                    key="show_notion_btn",
+                ):
+                    st.session_state["show_notion"] = not st.session_state[
+                        "show_notion"
+                    ]
+            if st.session_state["notion_status"] == "❌":
+                st.error(st.session_state["notion_msg"])
+                st.markdown("[Aide Notion](https://www.notion.com/my-integrations)")
+            # Google
+            col1, col2 = st.columns([8, 2])
+            with col1:
+                st.text_input(
+                    "Google (credentials.json/token.json dans config/)",
+                    value=st.session_state.get("google_info", ""),
+                    type="default" if st.session_state["show_google"] else "password",
+                    help="Générez credentials.json/token.json via Google Cloud Console : https://console.cloud.google.com/apis/credentials. Placez-les dans le dossier config/.",
+                )
+            with col2:
+                if st.button(
+                    "Afficher" if not st.session_state["show_google"] else "Masquer",
+                    key="show_google_btn",
+                ):
+                    st.session_state["show_google"] = not st.session_state[
+                        "show_google"
+                    ]
+            if st.session_state["google_status"] == "❌":
+                st.error(st.session_state["google_msg"])
+                st.markdown(
+                    "[Aide Google](https://console.cloud.google.com/apis/credentials)"
+                )
+            submitted = st.form_submit_button("Tester et enregistrer")
+            if submitted:
+                # Test OpenAI
+                import openai
+
+                try:
+                    openai.api_key = openai_key
+                    openai.Model.list()
+                    st.session_state["openai_status"] = "✅"
+                    st.session_state["openai_msg"] = "Connexion réussie."
+                    st.session_state["openai_key"] = openai_key
+                except Exception as e:
+                    st.session_state["openai_status"] = "❌"
+                    st.session_state["openai_msg"] = f"Erreur : {e}"
+                # Test Notion
+                try:
+                    from notion_client import Client
+
+                    notion = Client(auth=notion_key)
+                    notion.users.list()
+                    st.session_state["notion_status"] = "✅"
+                    st.session_state["notion_msg"] = "Connexion réussie."
+                    st.session_state["notion_key"] = notion_key
+                except Exception as e:
+                    st.session_state["notion_status"] = "❌"
+                    st.session_state["notion_msg"] = f"Erreur : {e}"
+                # Test Google
+                import os
+
+                cred_path = os.path.join("config", "credentials.json")
+                token_path = os.path.join("config", "token.json")
+                if os.path.exists(cred_path) and os.path.exists(token_path):
+                    try:
+                        from google.oauth2.credentials import Credentials
+
+                        Credentials.from_authorized_user_file(token_path)
+                        st.session_state["google_status"] = "✅"
+                        st.session_state["google_msg"] = (
+                            "Fichiers trouvés et token lisible."
+                        )
+                        st.session_state["google_info"] = "OK"
+                    except Exception as e:
+                        st.session_state["google_status"] = "❌"
+                        st.session_state["google_msg"] = (
+                            f"Erreur de lecture du token : {e}"
+                        )
+                else:
+                    st.session_state["google_status"] = "❌"
+                    st.session_state["google_msg"] = (
+                        "credentials.json ou token.json manquant dans config/"
+                    )
+        st.markdown("---")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if all(st.session_state[f"{s.lower()}_status"] == "✅" for s in services):
+                if st.button("Suivant ➡️"):
+                    st.session_state["onboarding_step"] += 1
+        with col2:
+            if st.button("Sauter cette étape", key="skip_connexions"):
+                st.session_state["onboarding_step"] += 1
     elif step == 2:
         st.subheader("2️⃣ Préférences de recherche")
         st.write(
             "Dans la barre latérale, renseignez vos mots-clés, localisation et sources d'offres, puis cliquez sur 'Enregistrer les préférences'."
         )
-        if st.button("Préférences enregistrées ✅"):
-            st.session_state["onboarding_step"] = 3
-            st.rerun()
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("⬅️ Précédent"):
+                st.session_state["onboarding_step"] -= 1
+        with col2:
+            if st.button("Suivant ➡️"):
+                st.session_state["onboarding_step"] += 1
+            if st.button("Sauter cette étape", key="skip_prefs"):
+                st.session_state["onboarding_step"] += 1
     elif step == 3:
         st.subheader("3️⃣ Découverte des fonctionnalités")
         st.markdown(
             "- **Tableau de bord** : Suivi de vos candidatures\n- **Générateur de CV/LM** : Documents personnalisés\n- **Préparation entretien** : Questions IA et briefing\n- **Analyse** : Statistiques et graphiques\n- **Planification** : Entretien dans Google Calendar\n- **Logs** : Suivi technique\n- **Guide utilisateur** : Aide pas à pas"
         )
-        if st.button("Terminer l'onboarding et accéder à l'application 🚀"):
+        st.markdown("---")
+        if st.button("🎉 Lancer l'application 🚀", type="primary"):
             st.session_state["onboarding_done"] = True
-            st.rerun()
+            st.experimental_rerun()
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("⬅️ Précédent", key="back_features"):
+                st.session_state["onboarding_step"] -= 1
+        with col2:
+            if st.button("Sauter cette étape", key="skip_features"):
+                st.session_state["onboarding_done"] = True
+                st.experimental_rerun()
     st.stop()
 
 
