@@ -3,6 +3,8 @@
 # Fichiers de configuration locaux et secrets
 config/.env
 *.env
+config/credentials.json
+config/token.json
 
 # Données utilisateur et CV
 /data/master_resume.pdf
