@@ -70,70 +70,47 @@ Voici comment bien démarrer :
                 "Message": [st.session_state[f"{s.lower()}_msg"] for s in services],
             }
         )
+        # Affichage/masquage des clés (checkbox hors du form)
+        st.session_state.setdefault("show_openai", False)
+        st.session_state.setdefault("show_notion", False)
+        st.session_state.setdefault("show_google", False)
+        show_openai = st.checkbox(
+            "Afficher la clé OpenAI", value=st.session_state["show_openai"]
+        )
+        st.session_state["show_openai"] = show_openai
+        show_notion = st.checkbox(
+            "Afficher la clé Notion", value=st.session_state["show_notion"]
+        )
+        st.session_state["show_notion"] = show_notion
+        show_google = st.checkbox(
+            "Afficher la clé Google", value=st.session_state["show_google"]
+        )
+        st.session_state["show_google"] = show_google
         with st.form("api_form_onboarding"):
-            # Gestion affichage/masquage des clés
-            if "show_openai" not in st.session_state:
-                st.session_state["show_openai"] = False
-            if "show_notion" not in st.session_state:
-                st.session_state["show_notion"] = False
-            if "show_google" not in st.session_state:
-                st.session_state["show_google"] = False
-            col1, col2 = st.columns([8, 2])
-            with col1:
-                openai_key = st.text_input(
-                    "Clé API OpenAI",
-                    value=st.session_state.get("openai_key", ""),
-                    type="default" if st.session_state["show_openai"] else "password",
-                    help="Clé API OpenAI. Obtenez-la ici : https://platform.openai.com/api-keys",
-                )
-            with col2:
-                if st.button(
-                    "Afficher" if not st.session_state["show_openai"] else "Masquer",
-                    key="show_openai_btn",
-                ):
-                    st.session_state["show_openai"] = not st.session_state[
-                        "show_openai"
-                    ]
+            openai_key = st.text_input(
+                "Clé API OpenAI",
+                value=st.session_state.get("openai_key", ""),
+                type="default" if show_openai else "password",
+                help="Clé API OpenAI. Obtenez-la ici : https://platform.openai.com/api-keys",
+            )
             if st.session_state["openai_status"] == "❌":
                 st.error(st.session_state["openai_msg"])
                 st.markdown("[Aide OpenAI](https://platform.openai.com/api-keys)")
-            # Notion
-            col1, col2 = st.columns([8, 2])
-            with col1:
-                notion_key = st.text_input(
-                    "Clé API Notion",
-                    value=st.session_state.get("notion_key", ""),
-                    type="default" if st.session_state["show_notion"] else "password",
-                    help="Clé d'intégration Notion. Créez-la ici : https://www.notion.com/my-integrations (puis partagez votre base avec l'intégration)",
-                )
-            with col2:
-                if st.button(
-                    "Afficher" if not st.session_state["show_notion"] else "Masquer",
-                    key="show_notion_btn",
-                ):
-                    st.session_state["show_notion"] = not st.session_state[
-                        "show_notion"
-                    ]
+            notion_key = st.text_input(
+                "Clé API Notion",
+                value=st.session_state.get("notion_key", ""),
+                type="default" if show_notion else "password",
+                help="Clé d'intégration Notion. Créez-la ici : https://www.notion.com/my-integrations (puis partagez votre base avec l'intégration)",
+            )
             if st.session_state["notion_status"] == "❌":
                 st.error(st.session_state["notion_msg"])
                 st.markdown("[Aide Notion](https://www.notion.com/my-integrations)")
-            # Google
-            col1, col2 = st.columns([8, 2])
-            with col1:
-                st.text_input(
-                    "Google (credentials.json/token.json dans config/)",
-                    value=st.session_state.get("google_info", ""),
-                    type="default" if st.session_state["show_google"] else "password",
-                    help="Générez credentials.json/token.json via Google Cloud Console : https://console.cloud.google.com/apis/credentials. Placez-les dans le dossier config/.",
-                )
-            with col2:
-                if st.button(
-                    "Afficher" if not st.session_state["show_google"] else "Masquer",
-                    key="show_google_btn",
-                ):
-                    st.session_state["show_google"] = not st.session_state[
-                        "show_google"
-                    ]
+            st.text_input(
+                "Google (credentials.json/token.json dans config/)",
+                value=st.session_state.get("google_info", ""),
+                type="default" if show_google else "password",
+                help="Générez credentials.json/token.json via Google Cloud Console : https://console.cloud.google.com/apis/credentials. Placez-les dans le dossier config/.",
+            )
             if st.session_state["google_status"] == "❌":
                 st.error(st.session_state["google_msg"])
                 st.markdown(
