@@ -22,16 +22,8 @@ def scrape_job_posting(url: str) -> str:
     return f"Contenu simulé de l'offre à l'URL {url}. Description: Développeur requis."
 
 
-@tool
-def scrape_linkedin(keywords: str, location: str) -> list:
-    """
-    Scrape les offres d'emploi sur LinkedIn correspondant aux mots-clés et à la localisation.
-    Retourne une liste de dictionnaires, chaque dictionnaire représentant une offre.
-    """
+def scrape_linkedin_pure(keywords: str, location: str) -> list:
     print(f"Scraping de LinkedIn pour '{keywords}' à '{location}'...")
-    # Logique de scraping complexe pour LinkedIn
-    # ...
-    # Placeholder
     return [
         {
             "title": "Ingénieur IA",
@@ -46,3 +38,63 @@ def scrape_linkedin(keywords: str, location: str) -> list:
             "description": "Offre Data...",
         },
     ]
+
+
+@tool
+def scrape_linkedin(keywords: str, location: str) -> list:
+    """Scrape les offres d'emploi sur LinkedIn correspondant aux mots-clés et à la localisation."""
+    return scrape_linkedin_pure(keywords, location)
+
+
+def scrape_indeed_pure(keywords: str, location: str) -> list:
+    print(f"Scraping de Indeed pour '{keywords}' à '{location}'...")
+    return [
+        {
+            "title": "Développeur Python",
+            "company": "IndeedTech",
+            "url": "http://indeed.com/1",
+            "description": "Offre Python Indeed...",
+        }
+    ]
+
+
+@tool
+def scrape_indeed(keywords: str, location: str) -> list:
+    """Scrape les offres d'emploi sur Indeed correspondant aux mots-clés et à la localisation."""
+    return scrape_indeed_pure(keywords, location)
+
+
+def scrape_apec_pure(keywords: str, location: str) -> list:
+    print(f"Scraping de Apec pour '{keywords}' à '{location}'...")
+    return [
+        {
+            "title": "Chef de Projet IT",
+            "company": "ApecPro",
+            "url": "http://apec.com/1",
+            "description": "Offre Chef de Projet Apec...",
+        }
+    ]
+
+
+@tool
+def scrape_apec(keywords: str, location: str) -> list:
+    """Scrape les offres d'emploi sur Apec correspondant aux mots-clés et à la localisation."""
+    return scrape_apec_pure(keywords, location)
+
+
+def scrape_pole_emploi_pure(keywords: str, location: str) -> list:
+    print(f"Scraping de Pôle Emploi pour '{keywords}' à '{location}'...")
+    return [
+        {
+            "title": "Analyste Données",
+            "company": "PoleEmploiData",
+            "url": "http://pole-emploi.fr/1",
+            "description": "Offre Analyste Données Pôle Emploi...",
+        }
+    ]
+
+
+@tool
+def scrape_pole_emploi(keywords: str, location: str) -> list:
+    """Scrape les offres d'emploi sur Pôle Emploi correspondant aux mots-clés et à la localisation."""
+    return scrape_pole_emploi_pure(keywords, location)

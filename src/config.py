@@ -54,6 +54,13 @@ GOOGLE_TOKEN_PATH = CONFIG_DIR / "token.json"
 GOOGLE_CREDENTIALS_PATH = CONFIG_DIR / "credentials.json"
 
 
+def save_preferences(preferences: dict):
+    """Sauvegarde les préférences utilisateur dans le fichier YAML."""
+    preferences_path = CONFIG_DIR / "preferences.yaml"
+    with open(preferences_path, "w", encoding="utf-8") as f:
+        yaml.safe_dump(preferences, f, allow_unicode=True)
+
+
 if __name__ == "__main__":
     # For testing the configuration loading
     print("--- Configuration Loaded ---")

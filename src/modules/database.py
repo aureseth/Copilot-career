@@ -3,13 +3,16 @@
 from notion_client import Client, APIResponseError
 import pandas as pd
 import config  # Utiliser le module de configuration centralisé
+from logger import logger
 
 # Initialisation du client Notion
 notion = None
 if config.NOTION_API_KEY:
     notion = Client(auth=config.NOTION_API_KEY)
+    logger.info("Client Notion initialisé.")
 else:
     print("Warning: NOTION_API_KEY not found. Notion integration will be disabled.")
+    logger.warning("NOTION_API_KEY manquante. Intégration Notion désactivée.")
 
 
 def _get_property_value(props, prop_name, prop_type):
@@ -46,6 +49,7 @@ def add_new_offer(offer_details: dict):
         return
 
     print(f"Ajout de l'offre '{offer_details['title']}' à Notion.")
+    logger.info(f"Ajout de l'offre '{offer_details['title']}' à Notion.")
     try:
         properties = {
             "Titre du Poste": {
@@ -71,6 +75,7 @@ def add_new_offer(offer_details: dict):
         )
     except APIResponseError as e:
         print(f"Erreur API Notion: {e}")
+        logger.error(f"Erreur API Notion lors de l'ajout d'une offre : {e}")
 
 
 def update_application_status(page_id: str, status: str):
@@ -83,12 +88,14 @@ def update_application_status(page_id: str, status: str):
         return
 
     print(f"Mise à jour de la page {page_id} avec le statut '{status}'.")
+    logger.info(f"Mise à jour du statut de la page {page_id} à '{status}'.")
     try:
         notion.pages.update(
             page_id=page_id, properties={"Statut": {"select": {"name": status}}}
         )
     except APIResponseError as e:
         print(f"Erreur API Notion: {e}")
+        logger.error(f"Erreur API Notion lors de la mise à jour du statut : {e}")
 
 
 def get_applications_as_dataframe():
@@ -100,6 +107,7 @@ def get_applications_as_dataframe():
         return pd.DataFrame()
 
     print("Récupération des candidatures depuis Notion.")
+    logger.info("Récupération des candidatures depuis Notion.")
     try:
         response = notion.databases.query(database_id=config.NOTION_DATABASE_ID)
         results = response.get("results", [])
@@ -116,6 +124,9 @@ def get_applications_as_dataframe():
                     props, "Date de Candidature", "date"
                 ),
                 "URL": _get_property_value(props, "URL", "url"),
+                "Description du Poste": _get_property_value(
+                    props, "Description du Poste", "rich_text"
+                ),
             }
             parsed_data.append(parsed_page)
 
@@ -123,6 +134,9 @@ def get_applications_as_dataframe():
 
     except APIResponseError as e:
         print(f"Erreur API Notion: {e}")
+        logger.error(
+            f"Erreur API Notion lors de la récupération des candidatures : {e}"
+        )
         return pd.DataFrame()
 
 

@@ -2,6 +2,7 @@
 
 from langchain_openai import OpenAI
 import config
+from pydantic import SecretStr
 
 
 def generate_interview_questions(job_description: str, resume_content: str):
@@ -9,7 +10,14 @@ def generate_interview_questions(job_description: str, resume_content: str):
     Génère des questions d'entretien pertinentes.
     """
     print("Génération des questions d'entretien...")
-    llm = OpenAI(api_key=config.OPENAI_API_KEY, temperature=0.7)
+    llm = OpenAI(
+        api_key=(
+            SecretStr(config.OPENAI_API_KEY)
+            if config.OPENAI_API_KEY is not None
+            else None
+        ),
+        temperature=0.7,
+    )
     prompt = f"""
     En te basant sur la description de poste ci-dessous et des extraits du CV du candidat,
     génère une liste de 10 questions d'entretien pertinentes (comportementales, techniques, situationnelles).
@@ -33,7 +41,14 @@ def create_company_brief(company_name: str):
     print(f"Création du briefing pour l'entreprise {company_name}...")
     # Dans une vraie implémentation, scraper le site de l'entreprise, les actualités, etc.
     # Ici, on utilise un LLM pour générer un exemple de synthèse.
-    llm = OpenAI(api_key=config.OPENAI_API_KEY, temperature=0.5)
+    llm = OpenAI(
+        api_key=(
+            SecretStr(config.OPENAI_API_KEY)
+            if config.OPENAI_API_KEY is not None
+            else None
+        ),
+        temperature=0.5,
+    )
     prompt = f"""
     Rédige un bref rapport de synthèse sur l'entreprise "{company_name}".
     Inclus sa mission, ses produits principaux, ses concurrents et des actualités récentes.

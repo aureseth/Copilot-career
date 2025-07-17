@@ -16,8 +16,18 @@ def create_vector_db_from_resume(resume_path: str):
     loader = PyPDFLoader(resume_path)
     documents = loader.load()
 
+    if not documents:
+        raise ValueError(
+            "Aucun texte n'a pu être extrait du PDF. Veuillez fournir un CV contenant du texte sélectionnable."
+        )
+
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     texts = text_splitter.split_documents(documents)
+
+    if not texts:
+        raise ValueError(
+            "Le PDF ne contient pas de texte exploitable pour la génération. Veuillez vérifier le fichier."
+        )
 
     embeddings = OpenAIEmbeddings(api_key=config.OPENAI_API_KEY)
     vectorstore = FAISS.from_documents(texts, embeddings)

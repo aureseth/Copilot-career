@@ -1,29 +1,12 @@
-# Préférences de recherche pour l'utilisateur
-# Ce fichier configure les cibles de recherche de l'agent.
-
-# Mots-clés pour la recherche de poste
-# Plusieurs mots-clés peuvent être utilisés
-keywords:
-  - "Ingénieur en Intelligence Artificielle"
-  - "Machine Learning Engineer"
-  - "Développeur Python Senior"
-
-# Localisation pour la recherche
-# Laisser vide pour une recherche à distance (remote)
-location: "Paris, France"
-
-# Sources à utiliser pour la recherche d'offres
-# Activer ou désactiver les sources
-sources:
-  linkedin: true
-  indeed: false # Exemple, non implémenté
-  apec: true   # Exemple, non implémenté
-  pole_emploi: false # Exemple, non implémenté
-  gmail_alerts: true
-
-# Paramètres pour l'analyse d'emails
 gmail:
-  # Rechercher uniquement les emails non lus
-  only_unread: true
-  # Placer les emails traités en "lu" après analyse
   mark_as_read: true
+  only_unread: true
+keywords:
+- Product Owner
+location: Rennes, France
+sources:
+  apec: true
+  gmail_alerts: true
+  indeed: true
+  linkedin: true
+  pole_emploi: true

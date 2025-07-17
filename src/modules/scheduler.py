@@ -1,6 +1,6 @@
 # Module V: Intégration avec Google Calendar
 
-from tools import calendar_tools
+from tools.calendar_tools import schedule_interview as schedule_interview_tool
 
 
 def schedule_interview_in_calendar(event_details: dict):
@@ -18,8 +18,8 @@ def schedule_interview_in_calendar(event_details: dict):
     """
     print(f"Planification de l'événement: {event_details['summary']}")
 
-    # L'outil calendar_tools s'occuperait de la logique de l'API
-    event_id = calendar_tools.schedule_interview(
+    # Appel direct à la fonction décorée (le décorateur @tool ne gêne pas l'appel direct)
+    event_id = schedule_interview_tool(
         summary=event_details["summary"],
         start_time=event_details["start_time"],
         end_time=event_details["end_time"],
