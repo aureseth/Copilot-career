@@ -1,0 +1,14 @@
+# ---
+# /config/preferences.yaml
+# Fichier de configuration pour les préférences utilisateur.
+
+search_query: 'Product Owner'
+location: 'Rennes, France'
+scan_gmail: True
+sites_to_scan:
+  - 'linkedin'
+  - 'indeed'
+  - 'apec'
+keywords:
+  - "Product Manager"
+  - "Chef de Produit Technique"

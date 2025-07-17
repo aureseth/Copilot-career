@@ -1,0 +1,129 @@
+Objectif Principal :
+Créer un agent d'intelligence artificielle autonome et complet en Python, nommé "Co-pilote de Carrière". Cet agent doit gérer l'intégralité du cycle de recherche d'emploi, de la découverte des offres à la préparation des entretiens, en passant par la candidature personnalisée, le suivi et l'analyse des performances. L'agent doit être modulaire, robuste et interactif via une interface utilisateur simple.
+
+Architecture et Technologies Fondamentales :
+
+Orchestration Principale : Utiliser LangChain comme framework central pour orchestrer les flux de travail complexes, gérer la logique de décision de l'agent, et enchaîner les différentes tâches.  
+
+Indexation et RAG : Utiliser LlamaIndex comme moteur spécialisé pour la Génération Augmentée par Récupération (RAG), spécifiquement pour l'indexation sémantique du CV de l'utilisateur et sa mise en correspondance avec les descriptions de poste.  
+
+Interface Utilisateur : Construire une interface utilisateur simple et intuitive avec Streamlit ou Gradio pour permettre à l'utilisateur de configurer l'agent, de visualiser les résultats et de lancer des actions.  
+
+Base de Données : Utiliser Notion comme base de données centralisée pour le suivi des candidatures.  
+
+Modèles de Langage (LLM) : S'intégrer avec des API de LLM performants comme celles d'OpenAI (GPT-4) ou d'Anthropic (Claude 3) pour la génération de texte et la synthèse.  
+
+Structure du Projet :
+Générer une structure de projet claire et maintenable :
+
+/career-copilot
+
+|-- /src
+| |-- main.py             # Point d'entrée, logique Streamlit/Gradio
+| |-- agent_core.py       # Définition de l'agent LangChain principal
+| |-- modules/
+| | |-- discovery.py    # Module I: Recherche d'offres (scraping, API)
+| | |-- database.py     # Module II: Connecteur Notion
+| | |-- generator.py    # Module III: Génération de CV/LM (RAG)
+| | |-- interview.py    # Module IV: Préparation aux entretiens
+| | |-- scheduler.py    # Module V: Intégration Google Calendar
+| | |-- analytics.py    # Module VI: Analyse des performances
+| |-- tools/              # Outils personnalisés pour LangChain
+| | |-- scraping_tools.py
+| | |-- notion_tools.py
+| | |-- gmail_tools.py
+| | |-- calendar_tools.py
+|-- /data
+| |-- master_resume.pdf   # CV principal de l'utilisateur
+|-- /output
+| |-- logs/
+| | |-- success.json
+| | |-- failed.json
+| | |-- skipped.json
+| | |-- openai_calls.json
+| |-- tailored_resumes/
+| |-- cover_letters/
+|-- /config
+| |--.env                # Clés d'API, identifiants (NE PAS VERSIONNER)
+| |-- preferences.yaml    # Préférences de recherche de l'utilisateur
+|-- requirements.txt
+Détail des Modules à Implémenter :
+Module I : Moteur de Découverte d'Emplois Omni-Source (discovery.py)
+
+Web Scraping Dynamique : Implémenter des scrapers basés sur Selenium ou Pyppeteer pour les sites dynamiques (ex: LinkedIn, Indeed). Le scraper doit gérer la connexion, le défilement infini et l'extraction des détails de chaque offre. Intégrer des stratégies anti-blocage (rotation de User-Agents, proxies, délais aléatoires).  
+
+Intégration d'API : Intégrer les API publiques disponibles (ex: Pôle Emploi, APEC).  
+
+Analyse d'Emails : Utiliser l'API Gmail pour scanner la boîte de réception à la recherche de réponses aux candidatures (confirmations, invitations à un entretien). Extraire les informations clés (nom de l'entreprise, statut, date de l'entretien) en utilisant des regex et   
+
+spaCy.  
+
+Module II : Base de Données de Suivi (database.py)
+
+Connecteur Notion : Créer un connecteur robuste pour l'API de Notion.
+
+Schéma de la Base de Données : La base de données Notion doit avoir les champs suivants : Titre du Poste, Entreprise, URL, Statut (Select: Découvert, Appliqué, Entretien, Offre, Rejeté), Date de Candidature, CV Adapté (Fichier), Lettre de Motivation (Fichier), Description du Poste (contenu de la page).
+
+Opérations CRUD : Implémenter des fonctions pour créer, lire et mettre à jour les entrées dans Notion . Par exemple, lorsqu'une nouvelle offre est découverte, créer une nouvelle page. Lorsque le module d'analyse d'emails détecte une invitation à un entretien, mettre à jour le statut de la page correspondante.
+
+Module III : Générateur de Documents de Candidature (generator.py)
+
+Pipeline RAG : Implémenter une pipeline de Génération Augmentée par Récupération (RAG) avec LlamaIndex et LangChain.  
+
+Indexation : Charger le master_resume.pdf, le découper en morceaux sémantiques, créer des embeddings (ex: avec sentence-transformers) et les stocker dans une base de données vectorielle (ex: FAISS).  
+
+Récupération : Pour une description de poste donnée, l'utiliser comme requête pour récupérer les morceaux les plus pertinents du CV.  
+
+Analyse des Écarts de Compétences : Utiliser spaCy ou SkillNER pour extraire les compétences du CV et de la description de poste. Comparer sémantiquement les deux listes pour identifier les correspondances et les écarts.  
+
+Génération : Utiliser un LLM avec un prompt avancé qui inclut la description de poste, les morceaux de CV récupérés et l'analyse des écarts de compétences pour générer un CV et une lettre de motivation hyper-personnalisés.  
+
+Crucial : Le prompt doit instruire le LLM de ne jamais inventer d'expériences.  
+
+Module IV : Suite de Préparation aux Entretiens (interview.py)
+
+Génération de Questions : À partir de la description de poste et du CV adapté, utiliser un LLM pour générer une liste de questions d'entretien pertinentes (comportementales, techniques, situationnelles).  
+
+Dossier d'Entreprise : Automatiser la création d'un briefing d'une page sur l'entreprise en scrapant son site web, les actualités récentes et les profils LinkedIn publics des interlocuteurs. Utiliser un LLM pour synthétiser ces informations en un rapport concis.  
+
+Synthèse Post-Entretien : Permettre à l'utilisateur de saisir ses notes après un entretien. Utiliser un LLM pour synthétiser ces notes avec les informations existantes afin de préparer le prochain tour.  
+
+Module V : Planification et Interface (scheduler.py, main.py)
+
+Intégration Google Calendar : Lorsque le module d'analyse d'emails (discovery.py) détecte une date et une heure d'entretien confirmées, il doit appeler une fonction dans scheduler.py. Cette fonction utilisera l'API Google Calendar pour créer automatiquement un événement dans l'agenda de l'utilisateur, en y incluant le titre du poste, le nom de l'entreprise et un lien vers le dossier d'entreprise généré par le Module IV.
+
+Interface Utilisateur avec Streamlit : Dans main.py, créer une interface utilisateur qui permet de :
+
+Configurer les préférences de recherche (preferences.yaml).
+
+Lancer manuellement une recherche d'offres.
+
+Afficher les candidatures suivies dans Notion dans un tableau de bord.
+
+Pour chaque candidature, proposer des boutons pour "Générer CV/LM" et "Préparer l'entretien".
+
+Afficher les analyses de performance du Module VI.
+
+Module VI : Analyse des Performances (analytics.py)
+
+Collecte de Données : Créer une fonction qui lit les données de la base de données Notion (statuts des candidatures) et des fichiers journaux (success.json, etc.).
+
+Calcul de Métriques : Calculer des statistiques clés :
+
+Taux de réponse par source d'emploi (LinkedIn, APEC, etc.).
+
+Taux de passage en entretien par type de poste.
+
+Analyse des mots-clés les plus fréquents dans les descriptions des postes ayant mené à un entretien.
+
+Visualisation : Préparer des graphiques et des tableaux simples (utilisant Matplotlib ou Plotly) à afficher dans l'interface Streamlit pour aider l'utilisateur à affiner sa stratégie de recherche.
+
+Considérations Éthiques et Opérationnelles :
+
+Supervision Humaine : L'agent ne doit jamais soumettre une candidature sans l'approbation explicite de l'utilisateur. L'interface doit présenter les documents générés pour validation avant tout envoi.  
+
+Respect des Plateformes : Implémenter une limitation de débit stricte pour le scraping afin de ne pas surcharger les serveurs. Respecter les directives du fichier   
+
+robots.txt.
+
+Sécurité : Utiliser le fichier .env pour toutes les clés d'API et les informations sensibles. Ce fichier doit être listé dans .gitignore.

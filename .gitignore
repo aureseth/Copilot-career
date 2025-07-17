@@ -1,0 +1,28 @@
+# Fichiers et dossiers à ignorer par Git
+
+# Fichiers de configuration locaux et secrets
+config/.env
+*.env
+
+# Données utilisateur et CV
+/data/master_resume.pdf
+
+# Fichiers de sortie générés
+/output/
+/logs/
+
+# Dépendances Python et caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Fichiers système
+.DS_Store
+Thumbs.db

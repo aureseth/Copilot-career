@@ -1,0 +1,42 @@
+# Dépendances Python du projet
+
+# --- Frameworks Core ---
+langchain
+langchain-openai
+streamlit
+# LlamaIndex n'est plus listé car LangChain gère bien le RAG.
+# Si des fonctionnalités spécifiques sont nécessaires, on peut l'ajouter.
+# llamaindex
+
+# --- Base de Données & APIs ---
+notion-client
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+
+# --- Traitement de données et NLP ---
+pandas
+spacy
+sentence-transformers # Pour les embeddings locaux
+faiss-cpu # Base de données vectorielle en mémoire
+
+# --- Web Scraping ---
+# selenium
+# beautifulsoup4
+# pyppeteer
+
+# --- Utilitaires ---
+pypdf # Pour charger les documents PDF (CV)
+pyyaml # Pour charger les fichiers de configuration .yaml
+python-dotenv # Pour gérer les variables d'environnement (.env)
+
+# --- Visualisation ---
+plotly
+matplotlib
+pytest
+
+# --- Code Quality & Formatting ---
+pre-commit
+black
+ruff
+mypy
