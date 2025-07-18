@@ -111,62 +111,82 @@ Voici comment bien démarrer :
                 type="default" if show_google else "password",
                 help="Générez credentials.json/token.json via Google Cloud Console : https://console.cloud.google.com/apis/credentials. Placez-les dans le dossier config/.",
             )
-            if st.session_state["google_status"] == "❌":
-                st.error(st.session_state["google_msg"])
-                st.markdown(
-                    "[Aide Google](https://console.cloud.google.com/apis/credentials)"
-                )
+            # Upload direct Google
+            st.markdown("**Upload direct des fichiers Google (optionnel)**")
+            cred_file = st.file_uploader(
+                "Uploader credentials.json", type=["json"], key="cred_upload"
+            )
+            token_file = st.file_uploader(
+                "Uploader token.json", type=["json"], key="token_upload"
+            )
+            if cred_file:
+                with open("config/credentials.json", "wb") as f:
+                    f.write(cred_file.read())
+                st.success("credentials.json uploadé !")
+            if token_file:
+                with open("config/token.json", "wb") as f:
+                    f.write(token_file.read())
+                st.success("token.json uploadé !")
             submitted = st.form_submit_button("Tester et enregistrer")
             if submitted:
-                # Test OpenAI
-                import openai
+                with st.spinner("Vérification en cours..."):
+                    # Test OpenAI
+                    import openai
 
-                try:
-                    openai.api_key = openai_key
-                    openai.Model.list()
-                    st.session_state["openai_status"] = "✅"
-                    st.session_state["openai_msg"] = "Connexion réussie."
-                    st.session_state["openai_key"] = openai_key
-                except Exception as e:
-                    st.session_state["openai_status"] = "❌"
-                    st.session_state["openai_msg"] = f"Erreur : {e}"
-                # Test Notion
-                try:
-                    from notion_client import Client
-
-                    notion = Client(auth=notion_key)
-                    notion.users.list()
-                    st.session_state["notion_status"] = "✅"
-                    st.session_state["notion_msg"] = "Connexion réussie."
-                    st.session_state["notion_key"] = notion_key
-                except Exception as e:
-                    st.session_state["notion_status"] = "❌"
-                    st.session_state["notion_msg"] = f"Erreur : {e}"
-                # Test Google
-                import os
-
-                cred_path = os.path.join("config", "credentials.json")
-                token_path = os.path.join("config", "token.json")
-                if os.path.exists(cred_path) and os.path.exists(token_path):
                     try:
-                        from google.oauth2.credentials import Credentials
-
-                        Credentials.from_authorized_user_file(token_path)
-                        st.session_state["google_status"] = "✅"
-                        st.session_state["google_msg"] = (
-                            "Fichiers trouvés et token lisible."
-                        )
-                        st.session_state["google_info"] = "OK"
+                        openai.api_key = openai_key
+                        openai.Model.list()
+                        st.session_state["openai_status"] = "✅"
+                        st.session_state["openai_msg"] = "Connexion réussie."
+                        st.session_state["openai_key"] = openai_key
                     except Exception as e:
+                        st.session_state["openai_status"] = "❌"
+                        st.session_state["openai_msg"] = f"Erreur : {e}"
+                    # Test Notion
+                    try:
+                        from notion_client import Client
+
+                        notion = Client(auth=notion_key)
+                        notion.users.list()
+                        st.session_state["notion_status"] = "✅"
+                        st.session_state["notion_msg"] = "Connexion réussie."
+                        st.session_state["notion_key"] = notion_key
+                    except Exception as e:
+                        st.session_state["notion_status"] = "❌"
+                        st.session_state["notion_msg"] = f"Erreur : {e}"
+                    # Test Google
+                    import os
+
+                    cred_path = os.path.join("config", "credentials.json")
+                    token_path = os.path.join("config", "token.json")
+                    if os.path.exists(cred_path) and os.path.exists(token_path):
+                        try:
+                            from google.oauth2.credentials import Credentials
+
+                            Credentials.from_authorized_user_file(token_path)
+                            st.session_state["google_status"] = "✅"
+                            st.session_state["google_msg"] = (
+                                "Fichiers trouvés et token lisible."
+                            )
+                            st.session_state["google_info"] = "OK"
+                        except Exception as e:
+                            st.session_state["google_status"] = "❌"
+                            st.session_state["google_msg"] = (
+                                f"Erreur de lecture du token : {e}"
+                            )
+                    else:
                         st.session_state["google_status"] = "❌"
                         st.session_state["google_msg"] = (
-                            f"Erreur de lecture du token : {e}"
+                            "credentials.json ou token.json manquant dans config/"
                         )
-                else:
-                    st.session_state["google_status"] = "❌"
-                    st.session_state["google_msg"] = (
-                        "credentials.json ou token.json manquant dans config/"
-                    )
+        # Encart d'aide groupé
+        with st.expander("❓ Besoin d'aide ?"):
+            st.markdown("""
+- [Créer une clé OpenAI](https://platform.openai.com/api-keys)
+- [Créer une intégration Notion](https://www.notion.com/my-integrations)
+- [Générer credentials Google](https://console.cloud.google.com/apis/credentials)
+- [Guide utilisateur détaillé](#)
+            """)
         st.markdown("---")
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -228,6 +248,32 @@ def main():
         or not st.session_state["onboarding_done"]
     ):
         onboarding()
+
+    # --- Ajout en haut du main() : badge/alerte API manquante ---
+    def show_api_alert():
+        missing = []
+        if not st.session_state.get("openai_key"):
+            missing.append("OpenAI")
+        if not st.session_state.get("notion_key"):
+            missing.append("Notion")
+        import os
+
+        cred_path = os.path.join("config", "credentials.json")
+        token_path = os.path.join("config", "token.json")
+        if not (os.path.exists(cred_path) and os.path.exists(token_path)):
+            missing.append("Google")
+        # Vérification préférences
+        from config import load_preferences
+
+        prefs = load_preferences()
+        if not prefs.get("keywords") or not prefs.get("location"):
+            missing.append("Préférences de recherche")
+        if missing:
+            st.warning(
+                f"⚠️ API(s)/Préférences non configurée(s) : {', '.join(missing)}. "
+                "<a href='#' target='_blank'>Besoin d'aide ?</a>",
+                unsafe_allow_html=True,
+            )
 
     # --- Page LOGS ---
     if choix == "Logs":
@@ -501,6 +547,10 @@ def main():
         st.caption("Votre agent IA pour une recherche d'emploi optimisée")
         with st.sidebar:
             st.header("⚙️ Préférences de recherche")
+            st.markdown(
+                "<span style='font-size:12px;color:#888'>Besoin d'aide ? <a href='#' target='_blank'>Voir la documentation sur les préférences</a></span>",
+                unsafe_allow_html=True,
+            )
             prefs = config.load_preferences()
             st.markdown(
                 "#### <span style='color:#4F8BF9'>Résumé</span>", unsafe_allow_html=True
@@ -573,6 +623,14 @@ def main():
                     }
                     config.save_preferences(new_prefs)
                     st.success("Préférences sauvegardées !")
+            # Exemple de préférences
+            st.markdown(
+                "<span style='font-size:12px;color:#888'>Exemple :<br>"
+                "Mots-clés : Data Scientist, Product Owner<br>"
+                "Localisation : Paris<br>"
+                "Sources : LinkedIn, Apec, Gmail</span>",
+                unsafe_allow_html=True,
+            )
         tab1, tab2, tab3, tab4 = st.tabs(
             [
                 "📊 Tableau de Bord",
