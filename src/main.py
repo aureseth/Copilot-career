@@ -217,7 +217,7 @@ Voici comment bien démarrer :
         st.markdown("---")
         if st.button("🎉 Lancer l'application 🚀", type="primary"):
             st.session_state["onboarding_done"] = True
-            st.experimental_rerun()
+            st.rerun()
         col1, col2 = st.columns([1, 1])
         with col1:
             if st.button("⬅️ Précédent", key="back_features"):
@@ -225,7 +225,7 @@ Voici comment bien démarrer :
         with col2:
             if st.button("Sauter cette étape", key="skip_features"):
                 st.session_state["onboarding_done"] = True
-                st.experimental_rerun()
+                st.rerun()
     st.stop()
 
 
