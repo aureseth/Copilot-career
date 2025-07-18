@@ -1,6 +1,9 @@
 # .github/workflows/ci.yml
 name: Python CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]
