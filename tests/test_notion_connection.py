@@ -1,5 +1,12 @@
+import os
+import pytest
+
 from modules import database
 import config
+
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Skip API tests in CI"
+)
 
 EXPECTED_PROPERTIES = [
     "Titre du Poste",

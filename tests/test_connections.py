@@ -1,5 +1,11 @@
 import config
 from modules import database
+import os
+import pytest
+
+pytestmark = pytest.mark.skipif(
+    os.getenv("CI") == "true", reason="Skip API tests in CI"
+)
 
 # Test Notion
 
