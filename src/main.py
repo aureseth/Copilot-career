@@ -5,6 +5,7 @@ import os
 from modules import database, generator, interview, analytics, discovery, scheduler
 import config
 from logger import logger
+from openai import OpenAI
 
 STATUTS = ["Découvert", "Appliqué", "Entretien", "Offre", "Rejeté"]
 STATUT_COLORS = {
@@ -131,11 +132,9 @@ Voici comment bien démarrer :
             if submitted:
                 with st.spinner("Vérification en cours..."):
                     # Test OpenAI
-                    import openai
-
                     try:
-                        openai.api_key = openai_key
-                        openai.Model.list()
+                        client = OpenAI(api_key=openai_key)
+                        _ = client.models.list()
                         st.session_state["openai_status"] = "✅"
                         st.session_state["openai_msg"] = "Connexion réussie."
                         st.session_state["openai_key"] = openai_key
