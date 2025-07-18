@@ -1,6 +1,6 @@
 # Module VI: Analyse des Performances
 
-import plotly.express as px
+import plotly.express as px  # type: ignore[import-untyped]
 from modules import database
 
 

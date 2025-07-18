@@ -2,8 +2,8 @@
 
 from langchain.tools import tool
 from .google_auth import get_credentials
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+from googleapiclient.discovery import build  # type: ignore[import-untyped]
+from googleapiclient.errors import HttpError  # type: ignore[import-untyped]
 import base64
 import email
 from email.message import Message
@@ -78,4 +78,7 @@ def scan_emails_for_updates_pure(
 def scan_emails_for_updates(
     query: str = "invitation entretien OR réponse candidature",
 ) -> list:
+    """
+    Scanne les emails pour détecter les mises à jour de candidatures (statuts, invitations, etc.).
+    """
     return scan_emails_for_updates_pure(query)

@@ -2,8 +2,8 @@
 
 from langchain.tools import tool
 from .google_auth import get_credentials
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+from googleapiclient.discovery import build  # type: ignore[import-untyped]
+from googleapiclient.errors import HttpError  # type: ignore[import-untyped]
 
 
 from typing import Optional, List
