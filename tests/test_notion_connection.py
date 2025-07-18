@@ -21,9 +21,9 @@ def test_notion_database_access():
     # Si la base est vide, on ne teste pas les colonnes
     if not df.empty:
         for prop in EXPECTED_PROPERTIES:
-            assert (
-                prop in df.columns
-            ), f"Propriété manquante dans la base Notion : {prop}"
+            assert prop in df.columns, (
+                f"Propriété manquante dans la base Notion : {prop}"
+            )
     else:
         # On vérifie au moins que les colonnes existent
         for prop in EXPECTED_PROPERTIES:

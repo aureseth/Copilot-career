@@ -24,6 +24,6 @@ def test_google_credentials():
     from tools import google_auth
 
     creds = google_auth.get_credentials()
-    assert (
-        creds is not None
-    ), "Impossible d'obtenir les credentials Google. Vérifiez le fichier credentials.json et le token."
+    assert creds is not None, (
+        "Impossible d'obtenir les credentials Google. Vérifiez le fichier credentials.json et le token."
+    )
