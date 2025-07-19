@@ -2,11 +2,12 @@ gmail:
   mark_as_read: true
   only_unread: true
 keywords:
+- Data Scientist
 - Product Owner
-location: Rennes, France
+location: Paris
 sources:
   apec: true
-  gmail_alerts: true
+  gmail_alerts: false
   indeed: true
   linkedin: true
-  pole_emploi: true
+  pole_emploi: false

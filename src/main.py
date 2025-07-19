@@ -180,12 +180,14 @@ Voici comment bien démarrer :
                         )
         # Encart d'aide groupé
         with st.expander("❓ Besoin d'aide ?"):
-            st.markdown("""
+            st.markdown(
+                """
 - [Créer une clé OpenAI](https://platform.openai.com/api-keys)
 - [Créer une intégration Notion](https://www.notion.com/my-integrations)
 - [Générer credentials Google](https://console.cloud.google.com/apis/credentials)
 - [Guide utilisateur détaillé](#)
-            """)
+            """
+            )
         st.markdown("---")
         col1, col2 = st.columns([1, 1])
         with col1:
